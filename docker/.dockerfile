@@ -1,0 +1,4 @@
+FROM postgres:latest
+ENV POSTGRES_USER artur
+ENV POSTGRES_PASSWORD Aqwe123!
+ENV POSTGRES_DB lotofacil

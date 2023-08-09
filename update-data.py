@@ -12,7 +12,7 @@ engine = create_engine(DATABASE_URL)
 conn = psycopg2.connect(DATABASE_URL)
 cursor = conn.cursor()
 cursor.execute("""
-    CREATE TABLE IF NOT EXISTS lotofacil_data (
+    CREATE TABLE IF NOT EXISTS resultados (
         Concurso INTEGER,
         Data DATE,
         Bola1 INTEGER,

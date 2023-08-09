@@ -10,13 +10,15 @@ engine = create_engine(DATABASE_URL)
 is_prime = utils.is_prime
 is_fibonacci = utils.is_fibonacci
 
+
 @stats.on_event("startup")
 def load_data():
     global data
-    data = pd.read_sql('SELECT * FROM lotofacil_data', engine)
+    data = pd.read_sql('SELECT * FROM resultados', engine)
     data['fibonacci_count'] = data.iloc[:, 2:-1].apply(lambda row: sum(is_fibonacci(n) for n in row), axis=1)
     data['even_count'] = data.iloc[:, 2:-1].apply(lambda row: sum(n % 2 == 0 for n in row), axis=1)
     data['odd_count'] = data.iloc[:, 2:-1].apply(lambda row: sum(n % 2 == 1 for n in row), axis=1)
+    print(data.iloc[:, 2:-1].head())
     data['prime_count'] = data.iloc[:, 2:-1].apply(lambda row: sum(is_prime(n) for n in row), axis=1)
 
 
@@ -55,7 +57,7 @@ def get_stats():
 
     with engine.connect() as conn:
         query = text("""
-            INSERT INTO lotofacil_stats (
+            INSERT INTO stats (
                 average_sum, max_sum, min_sum, std_dev_sum, last_sum,
                 average_even_numbers, average_odd_numbers, average_prime_numbers,
                 max_even_count, max_odd_numbers, max_prime_count,

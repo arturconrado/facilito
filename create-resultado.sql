@@ -1,0 +1,20 @@
+CREATE TABLE resultado (
+    Concurso INT PRIMARY KEY,
+    Data DATE,
+    bola_1 INT,
+    bola_2 INT,
+    bola_3 INT,
+    bola_4 INT,
+    bola_5 INT,
+    bola_6 INT,
+    bola_7 INT,
+    bola_8 INT,
+    bola_9 INT,
+    bola_10 INT,
+    bola_11 INT,
+    bola_12 INT,
+    bola_13 INT,
+    bola_14 INT,
+    bola_15 INT,
+    Soma INT
+);

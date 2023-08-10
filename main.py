@@ -14,16 +14,51 @@ is_fibonacci = utils.is_fibonacci
 @stats.on_event("startup")
 def load_data():
     global data
+
+    # Conexão com o banco de dados
+    try:
+        engine = create_engine(DATABASE_URL)
+        print("Conexão com o banco de dados estabelecida.")
+    except Exception as e:
+        print("Erro ao conectar ao banco de dados:", e)
+        return
+
+    # Executando a consulta SQL
+    try:
+        data = pd.read_sql('SELECT * FROM resultados', engine)
+        print("Consulta SQL executada com sucesso. Número de linhas:", len(data))
+    except Exception as e:
+        print("Erro ao executar a consulta SQL:", e)
+        return
+
+    # Verificando se o DataFrame está vazio
+    if data.empty:
+        print("DataFrame está vazio. Verifique a tabela 'resultados' no banco de dados.")
+        return
+
+    # Cálculo da contagem de números primos
+    try:
+        prime_counts = data.iloc[:, 2:-1].apply(lambda row: sum(is_prime(n) for n in row), axis=1)
+        print("Prime counts calculado com sucesso.")
+        data['prime_count'] = prime_counts
+    except Exception as e:
+        print("Erro ao calcular a contagem de números primos:", e)
+        return
+
     data = pd.read_sql('SELECT * FROM resultados', engine)
+    print(data.columns)
     data['fibonacci_count'] = data.iloc[:, 2:-1].apply(lambda row: sum(is_fibonacci(n) for n in row), axis=1)
     data['even_count'] = data.iloc[:, 2:-1].apply(lambda row: sum(n % 2 == 0 for n in row), axis=1)
     data['odd_count'] = data.iloc[:, 2:-1].apply(lambda row: sum(n % 2 == 1 for n in row), axis=1)
-    print(data.iloc[:, 2:-1].head())
-    data['prime_count'] = data.iloc[:, 2:-1].apply(lambda row: sum(is_prime(n) for n in row), axis=1)
+    prime_counts = data.iloc[:, 2:-1].apply(lambda row: sum(is_prime(n) for n in row), axis=1)
+    print("Prime counts:", prime_counts)
+    data['prime_count'] = prime_counts
 
 
 @stats.get("/stats")
 def get_stats():
+    print("Iniciando o carregamento dos dados...")
+    load_data()
     mean_sum = data['Soma'].mean().item()
     max_sum = data['Soma'].max().item()
     min_sum = data['Soma'].min().item()

@@ -45,4 +45,4 @@ bola_columns = [col for col in data.columns if 'bola' in col.lower()]
 data['Soma'] = data[bola_columns].sum(axis=1)
 
 # Use the SQLAlchemy engine to insert data into the table
-data.to_sql('lotofacil_data', engine, if_exists='replace', index=False)
+data.to_sql('resultados', engine, if_exists='replace', index=False)

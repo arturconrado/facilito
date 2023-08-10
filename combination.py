@@ -20,7 +20,7 @@ combination = FastAPI()
 
 
 class Stats(Base):
-    __tablename__ = "lotofacil_stats"
+    __tablename__ = "stats"
     average_sum = Column(Float, primary_key=True)
     max_sum = Column(Float)
     min_sum = Column(Float)

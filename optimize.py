@@ -4,6 +4,7 @@ import numpy as np
 
 app = FastAPI()
 
+
 class LotteryEnvironment:
     def __init__(self):
         self.state = 0
@@ -17,12 +18,14 @@ class LotteryEnvironment:
     def reset(self):
         self.state = 0
 
+
 class LotteryAgent:
     def __init__(self, environment):
         self.environment = environment
         self.q_table = np.zeros((10, 10))
 
-    def learn(self, episodes=1000, learning_rate=0.1, discount_factor=0.9, exploration_rate=1.0, exploration_decay=0.995):
+    def learn(self, episodes=1000, learning_rate=0.1, discount_factor=0.9, exploration_rate=1.0,
+              exploration_decay=0.995):
         for episode in range(episodes):
             state = self.environment.reset()
             done = False
@@ -36,7 +39,8 @@ class LotteryAgent:
                 done = True
 
                 self.q_table[state, action] = (1 - learning_rate) * self.q_table[state, action] + \
-                    learning_rate * (reward + discount_factor * np.max(self.q_table[next_state]))
+                                              learning_rate * (
+                                                          reward + discount_factor * np.max(self.q_table[next_state]))
 
                 state = next_state
 
@@ -44,6 +48,7 @@ class LotteryAgent:
 
     def get_optimal_strategy(self):
         return np.argmax(self.q_table[0]) + 1
+
 
 @app.post("/optimize/strategy")
 def optimize_strategy():

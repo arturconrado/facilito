@@ -1,62 +1,101 @@
-from fastapi import FastAPI
 from sqlalchemy import create_engine, Column, Float
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from itertools import combinations
-import random
-import utils
+from sqlalchemy.orm import sessionmaker
+from sklearn.ensemble import RandomForestRegressor
+import numpy as np
 
-# Database configuration
-DATABASE_URL = "postgresql://artur:Aqwe123!@localhost:5432/lotofacil"
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-db = SessionLocal()
-is_prime = utils.is_prime
-is_fibonacci = utils.is_fibonacci
-
+# SQLAlchemy setup
 Base = declarative_base()
-
-combination = FastAPI()
 
 
 class Stats(Base):
-    __tablename__ = "stats"
-    average_sum = Column(Float, primary_key=True)
+    __tablename__ = 'stats'
+    average_sum = Column(Float)
     max_sum = Column(Float)
     min_sum = Column(Float)
+    last_sum = Column(Float)
+    sum_std = Column(Float)
+    max_odd_count = Column(Float)
     max_even_count = Column(Float)
-    max_odd_numbers = Column(Float)
     max_prime_count = Column(Float)
     max_fibonacci_count = Column(Float)
+    last_odd_count = Column(Float)
+    last_even_count = Column(Float)
+    last_prime_count = Column(Float)
+    last_fibonacci_count = Column(Float)
+    fibonacci_count_std = Column(Float)
+    prime_count_std = Column(Float)
+    even_count_std = Column(Float)
+    odd_count_std = Column(Float)
+    average_odd_count = Column(Float)
+    average_even_count = Column(Float)
+    average_prime_count = Column(Float)
+    average_fibonacci_count = Column(Float)
+    min_odd_count = Column(Float)
+    min_even_count = Column(Float)
+    min_prime_count = Column(Float)
+    min_fibonacci_count = Column(Float)
+    last_bola1 = Column(Float)
+    last_bola2 = Column(Float)
+    last_bola3 = Column(Float)
+    last_bola13 = Column(Float)
+    last_bola14 = Column(Float)
+    last_bola15 = Column(Float)
+    average_bola1 = Column(Float)
+    average_bola2 = Column(Float)
+    average_bola3 = Column(Float)
+    average_bola13 = Column(Float)
+    average_bola14 = Column(Float)
+    average_bola15 = Column(Float)
+    max_bola1 = Column(Float)
+    max_bola2 = Column(Float)
+    max_bola3 = Column(Float)
+    max_bola13 = Column(Float)
+    max_bola14 = Column(Float)
+    max_bola15 = Column(Float)
+    min_bola13 = Column(Float)
+    min_bola14 = Column(Float)
+    min_bola15 = Column(Float)
+    bola13_std = Column(Float)
+    bola14_std = Column(Float)
+    bola15_std = Column(Float)
 
 
-def generate_combinations():
-    stats_data = db.query(Stats).first()
-    all_combinations = list(combinations(range(1, 26), 15))
-    valid_combinations = []
+DATABASE_URL = "postgresql://artur:Aqwe123!@localhost:5432/lotofacil"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-    for comb in all_combinations:
-        sum_comb = sum(comb)
-        even_count = sum(1 for x in comb if x % 2 == 0)
-        odd_count = 15 - even_count
-        prime_count = sum(1 for x in comb if is_prime(x))
-        fibonacci_count = sum(1 for x in comb if is_fibonacci(x))
+# Query the stats table
+db = SessionLocal()
+stats_query = db.query(Stats).first()
 
-        # Check if the combination meets the criteria
-        if (stats_data.min_sum <= sum_comb <= stats_data.max_sum and
-                even_count <= stats_data.max_even_count and
-                odd_count <= stats_data.max_odd_numbers and
-                prime_count <= stats_data.max_prime_count and
-                fibonacci_count <= stats_data.max_fibonacci_count):
-            valid_combinations.append(comb)
-            if len(valid_combinations) == 10:
-                break
+# Prepare the data for training
+X = [attr for attr in vars(stats_query).values() if isinstance(attr, (int, float))]
 
-    return valid_combinations
+# Example model training; adjust this part according to your actual data
+X = np.array([X])
+y = np.array([[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]])
+
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+model.fit(X, y)
 
 
-@combination.get("/combination")
-# Output the 10 valid combinations
-def get_combination():
-    valid_combinations = generate_combinations()
-    return {"combinations": valid_combinations}
+def generate_combinations(num_combinations, min_numbers, max_numbers):
+    combinations = []
+    for _ in range(num_combinations):
+        generated_combination = model.predict([X[0]]).astype(int)[0][:max_numbers]
+        combinations.append(generated_combination[:min_numbers])
+    return combinations
+
+
+# Ask the user for input
+num_combinations = int(input("Quantas combinações únicas você deseja? "))
+min_numbers = int(input("Quantos números de no mínimo (até 15)? "))
+max_numbers = int(input("Quantos números de no máximo (até 20)? "))
+
+# Generate the combinations
+combinations = generate_combinations(num_combinations, min_numbers, max_numbers)
+
+# Print the combinations
+for combination in combinations:
+    print(combination)

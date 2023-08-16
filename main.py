@@ -4,10 +4,11 @@ from fastapi import FastAPI
 from sqlalchemy import create_engine, text
 import pandas as pd
 import utils
+from env import DATABASE_URL
 
 stats = FastAPI()
 
-DATABASE_URL = "postgresql://artur:Aqwe123!@localhost:5432/lotofacil"
+
 engine = create_engine(DATABASE_URL)
 
 # Funções utilitárias
